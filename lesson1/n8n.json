@@ -1,0 +1,234 @@
+{
+    "name": "Chained vs Agentic Workflows",
+    "nodes": [
+      {
+        "parameters": {
+          "formTitle": "Personalized Cold Outreach message",
+          "formFields": {
+            "values": [
+              {
+                "fieldLabel": "LinkedIn URL",
+                "placeholder": "https://www.linkedin.com/in/jenhsunhuang/",
+                "requiredField": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.2,
+        "position": [
+          -128,
+          0
+        ],
+        "id": "35fd414b-e162-45a2-9577-b602f5beaa68",
+        "name": "On form submission",
+        "webhookId": "6eb545f5-ca96-471f-a9c7-e85d54c7e51e"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "o3",
+            "mode": "list",
+            "cachedResultName": "o3"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          160,
+          560
+        ],
+        "id": "86655fa0-d499-4628-8ee6-95ffe5d44ef3",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "hTsq7sNvjFHZfp7w",
+            "name": "OpenAi account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://enrichlayer.com/api/v2/profile",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "profile_url",
+                "value": "={{ $json['LinkedIn URL'] }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          224,
+          0
+        ],
+        "id": "c47921ad-2e2d-48d7-82f8-329a1d4acac6",
+        "name": "Get LinkedIn Profile Data",
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "X62qND7GxTRx39zY",
+            "name": "Bearer Auth account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4.1",
+            "mode": "list",
+            "cachedResultName": "GPT-4.1"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "=<linkedin_message_prompt>\n<task_context>\nRole: You are the founder/salesperson of a B2B SaaS company offering AI-powered sales automation solutions.\nProduct: An AI sales rep that automates 70% of a human’s work.\nCustomer: CEO/Founder/Heads of Sales in companies generating at least $1M in annual revenue.\n</task_context>\n\n<instructions>  \nWrite the first LinkedIn message after a connection is accepted, which:  \n1. Starts with a personal greeting.  \n2. Includes a specific observation about the recipient’s company.  \n3. Offers a clear value proposition with numbers (savings or growth).  \n4. Ends with a soft question about their interest.  \n5. If the prospect’s company is in Tech, use rap instead of regular text.  \n</instructions>  \n\n<example>  \nHi John,\n\nI noticed that you’re hiring sales reps: we offer an AI seller that automates 70% of a human’s work to cut costs and help scale without increasing headcount.\n\nWould this be of interest to you?\n\nBayram </example>\n\n<constraints>  \n– Length: 40–60 words  \n– Tone: Friendly and direct, not pushy  \n– Required: A specific benefit number (percentage or money)  \n– Never: Don’t offer a demo or call in the first message  \n– Signature: Bayram  \n</constraints>  \n\n<input_variables>\nContact name: {{ $json.first_name }}\nCompany: {{ $json.experiences[0].company }}\nWhat you noticed about the company: {{ $json.experiences[0].description }}\n</input_variables>\n\nOutput: Write a LinkedIn message using the information above.\n</linkedin_message_prompt>\n"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 1.8,
+        "position": [
+          448,
+          0
+        ],
+        "id": "bc937965-666a-47b1-93f5-e47eae82b0fe",
+        "name": "Write Outreach Message",
+        "credentials": {
+          "openAiApi": {
+            "id": "5K3fohoQDNuD2MWt",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Generate personalized cold outreach message for  {{ $json['LinkedIn URL'] }}",
+          "options": {
+            "systemMessage": "=<linkedin_message_prompt>\n<task_context>\nRole: You are the founder/salesperson of a B2B SaaS company offering AI-based solutions for sales automation.\nProduct: An AI sales rep that automates 70% of a human’s work.\nCustomer: CEO/Founder/Heads of Sales in companies generating at least $1M in annual revenue.\n</task_context>\n\n<instructions> 1) Using the user’s LinkedIn URL, download and review their LinkedIn profile.\n\nImportant: The user sometimes makes mistakes when typing their LinkedIn URL, so do your best to reconstruct the correct address if that happens and you can’t retrieve the profile.\n\nWrite the first LinkedIn message after the connection is accepted, which:\n1) Starts with a personal greeting.\n2) Includes a specific observation about the recipient’s company.\n3) Offers a clear value proposition with numbers (savings or growth).\n4) Ends with a soft question about their interest.\n</instructions>\n<example> Hi John,\n\nI noticed that you’re hiring sales reps: we offer an AI seller that automates 70% of a human’s work to reduce costs and enable scaling without adding headcount.\n\nIs this relevant?\n\nBayram\n</example>\n\n<constraints> \n– Length: 40–60 words \n– Tone: Friendly and direct, without pushiness \n– Required: A specific benefit number (percentage or money) \n– Never: Do not offer a demo or call in the first message \n– Signature: Bayram </constraints>\n\n</linkedin_message_prompt>"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          288,
+          352
+        ],
+        "id": "f8f152d8-5dc5-40e9-a385-e649766fee45",
+        "name": "Outreach Message Agent"
+      },
+      {
+        "parameters": {
+          "toolDescription": "Gets full LinkedIn profile of a person given their LinkedIn URL",
+          "url": "https://enrichlayer.com/api/v2/profile",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "profile_url",
+                "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequestTool",
+        "typeVersion": 4.2,
+        "position": [
+          592,
+          560
+        ],
+        "id": "62486945-e543-48e8-8f9a-83f45bbf702b",
+        "name": "Get LinkedIn Profile Tool",
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "X62qND7GxTRx39zY",
+            "name": "Bearer Auth account"
+          }
+        }
+      }
+    ],
+    "pinData": {},
+    "connections": {
+      "On form submission": {
+        "main": [
+          [
+            {
+              "node": "Get LinkedIn Profile Data",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Outreach Message Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Outreach Message Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get LinkedIn Profile Data": {
+        "main": [
+          [
+            {
+              "node": "Write Outreach Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Write Outreach Message": {
+        "main": [
+          []
+        ]
+      },
+      "Get LinkedIn Profile Tool": {
+        "ai_tool": [
+          [
+            {
+              "node": "Outreach Message Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "active": false,
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "versionId": "e48842f6-45f8-436d-a0e1-eb2de80f2e08",
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "3f0e0d72b0aea6beeb128f7247a1c33d525659c45532f4d32e5a5d898c5e6bdb"
+    },
+    "id": "UjriqIq5Z9dh8IKN",
+    "tags": []
+  }

@@ -1,0 +1,10 @@
+venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# Instructor materials (deck and teaching notes)
+*.pdf
+workshop.md

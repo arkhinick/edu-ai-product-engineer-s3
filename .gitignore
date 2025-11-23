@@ -1,0 +1,36 @@
+# Instructor materials (keep locally, don't commit to student repo)
+instructor/
+
+# Virtual environments
+venv/
+*/venv/
+
+# Environment files with secrets
+.env
+*/.env
+
+# Python cache
+__pycache__/
+*/__pycache__/
+*.pyc
+*.pyo
+
+# IDE and editor files
+.claude/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
