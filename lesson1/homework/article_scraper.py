@@ -475,7 +475,7 @@ async def analyze_homepage(
                             result.analysis += block.text
 
                 if isinstance(message, ResultMessage):
-                    # Парсим заголовок уже из целого markdown
+                    # Parse title from the entire markdown content
                     if result.analysis:
                         title_match = re.search(r"^#\s+(.+)$", result.analysis, re.MULTILINE)
                         if title_match:
