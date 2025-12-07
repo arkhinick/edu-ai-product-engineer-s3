@@ -13,7 +13,7 @@ With observability enabled (Laminar), you can see:
 Compare this with agent_raw_api.py to see what the SDK abstracts away.
 
 Usage:
-    python agent_with_laminar.py
+    python agent_with_sdk.py
 """
 
 import os

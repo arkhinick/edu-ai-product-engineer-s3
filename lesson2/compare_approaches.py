@@ -75,7 +75,7 @@ Fetch the profile and tell me about this person."""
         Laminar.initialize(project_api_key=api_key)
         print("  [Laminar] Initialized for full observability")
 
-    from agent_with_laminar import research_with_sdk
+    from agent_with_sdk import research_with_sdk
     sdk_metrics = await research_with_sdk(linkedin_url)
     results["sdk_laminar"] = sdk_metrics
 
