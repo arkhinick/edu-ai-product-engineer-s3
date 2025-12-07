@@ -1,4 +1,4 @@
-# Lesson 2: Tool Mastery & Reflection Pattern
+# Lesson 2: Building Reliable Agents
 
 ## Overview
 
