@@ -25,6 +25,25 @@ Workshop 4 (1,200 lines)   → Evaluation framework & A/B testing
 Workshop 5 (2,500+ lines)  → Multi-modal capabilities (voice, code, UI)
 ```
 
+### Workshop 2: Reflection Pattern & Observability
+
+Workshop 2 teaches you how to break the "prompt engineering plateau" using external feedback:
+
+**Key Concepts:**
+- **Reflection Pattern** - Three-turn flow: V1 research → human feedback → V2 improvement
+- **External Feedback** - Human-in-the-loop validation as a tool
+- **Observability** - Laminar integration to see what happens inside agents
+- **Raw API vs SDK** - Understanding token costs and what the SDK abstracts away
+
+**Scripts:**
+| File | Purpose |
+|------|---------|
+| `research_agent_v2.py` | Main demo: Reflection pattern with structured output |
+| `agent_raw_api.py` | Educational: Raw Anthropic API without SDK |
+| `agent_with_laminar.py` | SDK with full observability enabled |
+| `compare_approaches.py` | Side-by-side comparison of approaches |
+| `tools/human_feedback.py` | Human-in-the-loop tool implementation |
+
 ## Repository Structure
 
 ```
@@ -42,7 +61,21 @@ edu-ai-product-engineer-s3/
 │   ├── verify_setup.py         (Setup verification script)
 │   ├── n8n.json                (No-code demo workflow)
 │   └── requirements.txt
-├── lesson2/                     (Coming soon)
+├── lesson2/                     (Reflection Pattern & Observability)
+│   ├── README.md               (Lesson overview)
+│   ├── research_agent_v2.py    (Main demo: Reflection pattern)
+│   ├── agent_raw_api.py        (Raw API implementation)
+│   ├── agent_with_laminar.py   (SDK + observability)
+│   ├── compare_approaches.py   (Side-by-side comparison)
+│   ├── demo_data.py            (Test data & scenarios)
+│   ├── tools/
+│   │   ├── linkedin.py         (Enhanced LinkedIn tool)
+│   │   └── human_feedback.py   (Human-in-the-loop tool)
+│   ├── prompts/
+│   │   └── reflection.py       (Prompt templates)
+│   ├── utils/
+│   │   └── observability.py    (Laminar integration)
+│   └── requirements.txt
 ├── lesson3/                     (Coming soon)
 ├── lesson4/                     (Coming soon)
 └── lesson5/                     (Coming soon)
