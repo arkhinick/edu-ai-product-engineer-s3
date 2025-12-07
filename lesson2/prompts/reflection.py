@@ -47,8 +47,7 @@ V1_RESEARCH_PROMPT = """Research this prospect for B2B sales outreach.
 
 LinkedIn URL: {linkedin_url}
 
-IMPORTANT: Only use the fetch_linkedin_profile tool in this step.
-Do NOT call request_human_review yet - that happens in the next step.
+Use to-dos to track your progress and complete the research.
 
 Your task:
 1. Fetch the LinkedIn profile using the fetch_linkedin_profile tool
@@ -139,4 +138,8 @@ Format the V2 research with the same structure as V1:
 If the feedback indicated approval with no issues, acknowledge this and present
 a refined version with any minor improvements you can make.
 
-IMPROVED RESEARCH REPORT (V2):"""
+IMPROVED RESEARCH REPORT (V2):
+
+FINAL ACTIONS:
+After generating your improved V2 research: save it in /research_output/ using the prospect's name in the filename (e.g., john_smith_research.md)
+and return the filename as the output."""
