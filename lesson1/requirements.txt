@@ -6,6 +6,8 @@ python-dotenv>=1.0.0
 langgraph>=0.2.0  # For LangGraph workflows
 langchain>=0.3.0  # For LangChain agent tools
 langchain-anthropic>=0.3.0  # Anthropic chat model integration
+firecrawl-py>=4.10.1  # Added for homepage scraper
+beautifulsoup4>=4.12.0 # Required for parsing HTML in scraper
 
 # For testing and comparison
 colorama>=0.4.6
