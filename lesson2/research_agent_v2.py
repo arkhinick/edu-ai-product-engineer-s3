@@ -25,8 +25,23 @@ Observability:
 """
 
 import os
+import sys
 import asyncio
+import logging
 from dotenv import load_dotenv
+
+# Suppress noisy Laminar proxy errors (TLS issues that don't affect functionality)
+# These errors appear as "hyper::Error" or "Failed to create span" but are non-blocking
+class LaminarErrorFilter(logging.Filter):
+    def filter(self, record):
+        msg = record.getMessage()
+        # Filter out known Laminar proxy errors
+        if any(x in msg for x in ['hyper::Error', 'BadRecordMac', 'Failed to create span', 'Failed to send trace']):
+            return False
+        return True
+
+# Apply filter to root logger
+logging.getLogger().addFilter(LaminarErrorFilter())
 
 # Import observability utilities (optional - works without Laminar)
 from utils.observability import (
@@ -61,6 +76,46 @@ from prompts.reflection import (
 )
 
 load_dotenv()
+
+
+# ============================================================================
+# STRUCTURED OUTPUTS (OPTIONAL)
+# ============================================================================
+# Uncomment and use this schema to get validated JSON instead of free-text.
+# This is useful when you need to:
+# - Save research to a database/CRM
+# - Pass results to another agent
+# - Ensure consistent output format
+#
+# Usage: Add to ClaudeAgentOptions or query():
+#   options={
+#       "output_format": {
+#           "type": "json_schema",
+#           "schema": RESEARCH_SCHEMA
+#       }
+#   }
+
+RESEARCH_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "prospect_name": {"type": "string"},
+        "company": {"type": "string"},
+        "role": {"type": "string"},
+        "pain_points": {
+            "type": "array",
+            "items": {"type": "string"}
+        },
+        "talking_points": {
+            "type": "array",
+            "items": {"type": "string"}
+        },
+        "confidence": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+        }
+    },
+    "required": ["prospect_name", "pain_points", "talking_points"]
+}
 
 
 # ============================================================================
@@ -196,6 +251,10 @@ async def research_with_reflection(linkedin_url: str) -> dict:
         ],
         system_prompt=SYSTEM_PROMPT,
         max_turns=15,
+        # output_format={
+        #   "type": "json_schema",
+        #   "schema": RESEARCH_SCHEMA
+        # }
     )
 
     try:
@@ -302,7 +361,9 @@ async def research_with_reflection(linkedin_url: str) -> dict:
                 print("OBSERVABILITY SUMMARY")
                 print(f"{'='*60}")
                 print(f"  Generations: {trace_summary['generations']}")
-                print(f"  Total tokens: {trace_summary['input_tokens']} in / {trace_summary['output_tokens']} out")
+                # Only show token count if available (some SDK versions don't report this)
+                if trace_summary.get('input_tokens', 0) > 0 or trace_summary.get('output_tokens', 0) > 0:
+                    print(f"  Total tokens: {trace_summary['input_tokens']} in / {trace_summary['output_tokens']} out")
                 print(f"  Total cost: ${trace_summary['cost_usd']:.6f}")
                 print(f"  Duration: {trace_summary['duration_s']:.2f}s")
                 print(f"{'='*60}")
@@ -344,17 +405,20 @@ def show_comparison(result: dict):
     print("V1 vs V2 COMPARISON")
     print(f"{'='*60}")
 
+    # Show V1 summary (first 1500 chars to capture key sections)
     print("\n--- V1 (Before External Feedback) ---")
     v1 = result.get("v1_research", "")
-    print(v1[:1000] + "..." if len(v1) > 1000 else v1)
+    print(v1[:1500] + "\n..." if len(v1) > 1500 else v1)
 
+    # Show feedback received (this is the key external signal)
     print("\n--- External Feedback Received ---")
     feedback = result.get("feedback", "")
-    print(feedback[:500] + "..." if len(feedback) > 500 else feedback)
+    print(feedback[:800] + "\n..." if len(feedback) > 800 else feedback)
 
+    # Show V2 summary (first 1500 chars to capture improvements)
     print("\n--- V2 (After Reflection) ---")
     v2 = result.get("v2_research", "")
-    print(v2[:1000] + "..." if len(v2) > 1000 else v2)
+    print(v2[:1500] + "\n..." if len(v2) > 1500 else v2)
 
     print(f"\n{'='*60}")
     print("KEY INSIGHT: The V2 research incorporates external feedback")

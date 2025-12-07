@@ -39,17 +39,11 @@ AUTO_FEEDBACK = os.getenv("AUTO_FEEDBACK", "").lower() in ("true", "1", "yes")
 
     RETURNS:
     - rating: 1-5 quality score from human reviewer
-    - feedback: Specific feedback on what to improve
-    - missing_info: What information is missing that should be found
-    - corrections: What information needs to be corrected
+    - comment: Feedback on what to improve, what's missing, or corrections
     - approved: Whether human approves the research (rating >= 4)
 
     This is EXTERNAL FEEDBACK - signals you cannot generate by reasoning alone.
-    Human judgment catches errors that automated checks miss, including:
-    - Factual inaccuracies you might not detect
-    - Missing context that would improve the research
-    - Quality issues that aren't obvious from the data
-    - Real-world knowledge about the prospect or company
+    Human judgment catches errors that automated checks miss.
 
     INPUT:
     - research_summary: The research output to be reviewed
@@ -84,22 +78,18 @@ async def request_human_review(args: dict[str, Any]) -> dict[str, Any]:
         # Provide realistic demo feedback that demonstrates the reflection pattern
         auto_result = {
             "rating": 3,
-            "feedback": "Add more specific pain points for their industry",
-            "missing_info": "Missing recent news about the company's market position",
-            "corrections": None,
+            "comment": "Add more specific pain points. Missing recent news about company's market position.",
             "approved": False
         }
 
         print(f"  Auto-generated feedback:")
         print(f"    Rating: {auto_result['rating']}/5 (Needs improvement)")
-        print(f"    Improvements: {auto_result['feedback']}")
-        print(f"    Missing: {auto_result['missing_info']}")
+        print(f"    Comment: {auto_result['comment']}")
 
         response_text = f"""Human Review Feedback for {prospect}:
 - Rating: {auto_result['rating']}/5
 - Approved: No - needs improvement
-- Improvement suggestions: {auto_result['feedback']}
-- Missing information: {auto_result['missing_info']}"""
+- Comment: {auto_result['comment']}"""
 
         return {
             "content": [{
@@ -108,7 +98,7 @@ async def request_human_review(args: dict[str, Any]) -> dict[str, Any]:
             }]
         }
 
-    # Interactive mode - collect structured feedback from human
+    # Interactive mode - collect feedback from human
     print("\nPlease review the research above and provide feedback:")
     print("(This is EXTERNAL FEEDBACK that helps improve the research)\n")
 
@@ -131,45 +121,31 @@ async def request_human_review(args: dict[str, Any]) -> dict[str, Any]:
     except ValueError:
         rating_int = 3
 
-    # Collect detailed feedback
+    # Collect feedback comment
     print(f"\n  Your rating: {rating_int}/5")
+    comment = input("  Comment (improvements, missing info, corrections): ").strip()
 
-    feedback = input("  What could be improved? (or 'none'): ").strip()
-    missing = input("  What's missing? (or 'none'): ").strip()
-    corrections = input("  Any corrections needed? (or 'none'): ").strip()
-
-    # Build structured result
+    # Build result
     result = {
         "rating": rating_int,
-        "feedback": feedback if feedback.lower() not in ['none', 'n', ''] else None,
-        "missing_info": missing if missing.lower() not in ['none', 'n', ''] else None,
-        "corrections": corrections if corrections.lower() not in ['none', 'n', ''] else None,
+        "comment": comment if comment.lower() not in ['none', 'n', ''] else None,
         "approved": rating_int >= 4
     }
 
     # Provide summary
     print(f"\n  Feedback collected:")
     print(f"    Rating: {rating_int}/5 {'(Approved)' if result['approved'] else '(Needs improvement)'}")
-    if result['feedback']:
-        print(f"    Improvements: {result['feedback']}")
-    if result['missing_info']:
-        print(f"    Missing: {result['missing_info']}")
-    if result['corrections']:
-        print(f"    Corrections: {result['corrections']}")
+    if result['comment']:
+        print(f"    Comment: {result['comment']}")
 
     # Build response text for Claude
     response_parts = [f"Human Review Feedback for {prospect}:"]
     response_parts.append(f"- Rating: {rating_int}/5")
     response_parts.append(f"- Approved: {'Yes' if result['approved'] else 'No - needs improvement'}")
 
-    if result['feedback']:
-        response_parts.append(f"- Improvement suggestions: {result['feedback']}")
-    if result['missing_info']:
-        response_parts.append(f"- Missing information: {result['missing_info']}")
-    if result['corrections']:
-        response_parts.append(f"- Corrections needed: {result['corrections']}")
-
-    if not any([result['feedback'], result['missing_info'], result['corrections']]):
+    if result['comment']:
+        response_parts.append(f"- Comment: {result['comment']}")
+    else:
         response_parts.append("- No specific issues identified")
 
     # Return in MCP tool result format

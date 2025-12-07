@@ -17,12 +17,7 @@ You have access to these tools:
 - fetch_linkedin_profile: Get professional background from LinkedIn URLs
 - request_human_review: Request human feedback on your research quality
 
-IMPORTANT GUIDELINES:
-
-1. Always start by fetching the LinkedIn profile to gather factual data
-2. Analyze the profile data quality - note any missing or incomplete information
-3. Before finalizing, request human review to validate your research
-4. Use the human feedback to improve your research in the reflection phase
+IMPORTANT: Only use tools when explicitly instructed. Follow the step-by-step process.
 
 Your research should be:
 - Accurate: Based on verified data, not assumptions
@@ -51,6 +46,9 @@ QUALITY CRITERIA CHECKLIST:
 V1_RESEARCH_PROMPT = """Research this prospect for B2B sales outreach.
 
 LinkedIn URL: {linkedin_url}
+
+IMPORTANT: Only use the fetch_linkedin_profile tool in this step.
+Do NOT call request_human_review yet - that happens in the next step.
 
 Your task:
 1. Fetch the LinkedIn profile using the fetch_linkedin_profile tool
@@ -87,19 +85,15 @@ Note any missing information or limitations in the research."""
 # Validation prompt (Turn 2 - Request external feedback)
 VALIDATION_PROMPT = """Now validate your research using external feedback.
 
-You've completed initial research. Before finalizing, get human review to ensure quality.
-
-Use the request_human_review tool to:
-1. Present your research summary to a human reviewer
-2. Collect their feedback on what could be improved
-3. Learn what information might be missing
-4. Get any corrections needed
+Use the request_human_review tool to get human feedback on your research.
 
 Pass your complete research report as the research_summary parameter.
 
-This external feedback will provide signals you cannot generate by reasoning alone:
+IMPORTANT: After receiving the feedback, STOP. Do NOT generate improvements yet.
+Simply acknowledge what feedback was received. The next step will handle improvements.
+
+This external feedback provides signals you cannot generate by reasoning alone:
 - Real-world knowledge about the prospect or company
-- Industry insights you might not have
 - Quality assessment from human judgment
 - Missing context that would strengthen the research"""
 
