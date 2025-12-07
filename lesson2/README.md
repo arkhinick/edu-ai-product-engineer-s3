@@ -28,7 +28,7 @@ Turn 3: Reflect and Generate V2 (improved)
 lesson2/
 ├── research_agent_v2.py      # Main agent with reflection pattern
 ├── agent_raw_api.py          # Raw API implementation (under the hood)
-├── agent_with_laminar.py     # SDK with Laminar observability
+├── agent_with_sdk.py         # SDK implementation
 ├── compare_approaches.py     # Comparison script for demo
 ├── tools/
 │   ├── linkedin.py           # Improved LinkedIn tool with quality analysis
@@ -238,7 +238,7 @@ Compare the outputs to understand what the SDK is doing for you.
 | File | Purpose |
 |------|---------|
 | `agent_raw_api.py` | Agent using direct Anthropic API (no SDK) |
-| `agent_with_laminar.py` | SDK agent with Laminar tracing |
+| `agent_with_sdk.py` | SDK agent implementation |
 | `compare_approaches.py` | Runs both and compares metrics |
 
 ### Why Observability Matters

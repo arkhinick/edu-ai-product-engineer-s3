@@ -46,7 +46,7 @@ edu-ai-product-engineer-s3/
 │   ├── README.md               (Lesson overview)
 │   ├── research_agent_v2.py    (Main demo: Reflection pattern)
 │   ├── agent_raw_api.py        (Raw API implementation)
-│   ├── agent_with_laminar.py   (SDK + observability)
+│   ├── agent_with_sdk.py       (SDK implementation)
 │   ├── compare_approaches.py   (Side-by-side comparison)
 │   ├── demo_data.py            (Test data & scenarios)
 │   ├── tools/

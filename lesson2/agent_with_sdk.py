@@ -1,8 +1,8 @@
 """
-AGENT WITH LAMINAR: Claude Agent SDK + Full Observability
+AGENT WITH SDK: Claude Agent SDK Implementation
 
-This file demonstrates the Claude Agent SDK with Laminar observability.
-Laminar's Rust proxy intercepts ALL SDK communications, showing:
+This file demonstrates the Claude Agent SDK approach.
+With observability enabled (Laminar), you can see:
 
 1. Full conversation history (including what you don't see)
 2. System prompts
